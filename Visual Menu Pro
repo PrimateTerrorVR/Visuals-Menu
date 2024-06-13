@@ -1,0 +1,759 @@
+To enhance the menu further by adding a settings page where you can customize aspects such as menu size, color, and title, and also to implement a title at the top of the menu, here's how you can modify and extend the existing code:
+
+```javascript
+// Initialize the menu and settings
+var menuContainer = document.createElement('div');
+menuContainer.style.position = 'fixed';
+menuContainer.style.top = '50px';
+menuContainer.style.left = '50px';
+menuContainer.style.padding = '20px';
+menuContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+menuContainer.style.border = '1px solid #ccc';
+menuContainer.style.borderRadius = '10px'; // Rounded corners
+menuContainer.style.width = '300px'; // Initial width
+menuContainer.style.maxHeight = '80vh'; // Limit height for scrolling
+menuContainer.style.overflowY = 'auto'; // Enable vertical scrolling
+document.body.appendChild(menuContainer);
+
+// Function to make an element draggable
+function makeDraggable(element) {
+    element.style.cursor = 'move';
+    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    element.onmousedown = dragMouseDown;
+
+    function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        element.style.top = (element.offsetTop - pos2) + "px";
+        element.style.left = (element.offsetLeft - pos1) + "px";
+    }
+
+    function closeDragElement() {
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
+}
+
+// Function to clear all effects
+function clearAllEffects() {
+    var styleTags = document.querySelectorAll('style');
+    styleTags.forEach(tag => tag.remove());
+    document.body.style.background = '';
+    document.body.style.color = '';
+    document.body.style.animation = '';
+    menuContainer.innerHTML = '';
+    showMainEffects();
+}
+
+// Helper function to create a button
+function createButton(text, onClick) {
+    var button = document.createElement('button');
+    button.textContent = text;
+    button.style.width = '100%';
+    button.style.marginBottom = '10px'; // Add margin between buttons
+    button.style.padding = '10px';
+    button.style.border = 'none';
+    button.style.backgroundColor = '#007BFF';
+    button.style.color = 'white';
+    button.style.fontSize = '16px';
+    button.style.cursor = 'pointer';
+    button.addEventListener('click', onClick);
+    return button;
+}
+
+// Helper function to create a slider
+function createSlider(labelText, min, max, value, onInput) {
+    var container = document.createElement('div');
+    container.style.marginBottom = '10px'; // Add margin below each slider
+
+    var label = document.createElement('label');
+    label.textContent = labelText;
+    label.style.display = 'block';
+    label.style.marginBottom = '5px';
+    container.appendChild(label);
+    
+    var slider = document.createElement('input');
+    slider.type = 'range';
+    slider.min = min;
+    slider.max = max;
+    slider.value = value;
+    slider.style.width = '100%';
+    slider.addEventListener('input', onInput);
+    slider.addEventListener('mousedown', function(e) {
+        e.stopPropagation(); // Prevents drag behavior when clicking on the slider
+    });
+    
+    container.appendChild(slider);
+    return container;
+}
+
+// Function to show main effects
+function showMainEffects() {
+    menuContainer.innerHTML = '';
+
+    var effects = [
+        { name: 'Rainbow Background', action: applyRainbowBackground },
+        { name: 'Invert Colors', action: applyInvert },
+        { name: 'Grayscale', action: applyGrayscale },
+        { name: 'Sepia', action: applySepia },
+        { name: 'Blur', action: applyBlur },
+        { name: 'Brightness', action: applyBrightness },
+        { name: 'Contrast', action: applyContrast },
+        { name: 'Hue Rotate', action: applyHueRotate },
+        { name: 'Saturate', action: applySaturate }
+        // Add more effects as needed
+    ];
+
+    effects.forEach(function(effect) {
+        var button = createButton(effect.name, effect.action);
+        menuContainer.appendChild(button);
+    });
+
+    addSettingsButton();
+    makeDraggable(menuContainer);
+}
+
+// Function to add a settings button
+function addSettingsButton() {
+    var settingsButton = createButton('Settings', showSettingsPage);
+    menuContainer.appendChild(settingsButton);
+}
+
+// Function to show settings page
+function showSettingsPage() {
+    menuContainer.innerHTML = '';
+
+    var title = document.createElement('h2');
+    title.textContent = 'Primates Visual Menu Pro Settings';
+    title.style.textAlign = 'center';
+    title.style.marginBottom = '20px';
+    menuContainer.appendChild(title);
+
+    // Settings for menu customization
+    var menuSettings = document.createElement('div');
+    menuSettings.style.marginBottom = '20px';
+
+    var menuTitleLabel = document.createElement('label');
+    menuTitleLabel.textContent = 'Menu Title:';
+    menuTitleLabel.style.display = 'block';
+    menuTitleLabel.style.marginBottom = '5px';
+    menuSettings.appendChild(menuTitleLabel);
+
+    var menuTitleInput = document.createElement('input');
+    menuTitleInput.type = 'text';
+    menuTitleInput.value = 'Primates Visual Menu Pro';
+    menuTitleInput.style.width = '100%';
+    menuSettings.appendChild(menuTitleInput);
+
+    var menuColorLabel = document.createElement('label');
+    menuColorLabel.textContent = 'Menu Color:';
+    menuColorLabel.style.display = 'block';
+    menuColorLabel.style.marginTop = '10px';
+    menuColorLabel.style.marginBottom = '5px';
+    menuSettings.appendChild(menuColorLabel);
+
+    var menuColorInput = document.createElement('input');
+    menuColorInput.type = 'color';
+    menuColorInput.value = '#007BFF';
+    menuColorInput.style.width = '100px';
+    menuSettings.appendChild(menuColorInput);
+
+    var applySettingsButton = document.createElement('button');
+    applySettingsButton.textContent = 'Apply Settings';
+    applySettingsButton.style.width = '100%';
+    applySettingsButton.style.marginTop = '10px';
+    applySettingsButton.style.padding = '10px';
+    applySettingsButton.style.border = 'none';
+    applySettingsButton.style.backgroundColor = '#28A745';
+    applySettingsButton.style.color = 'white';
+    applySettingsButton.style.fontSize = '16px';
+    applySettingsButton.style.cursor = 'pointer';
+    applySettingsButton.addEventListener('click', function() {
+        menuContainer.style.backgroundColor = menuColorInput.value;
+        title.textContent = menuTitleInput.value;
+    });
+    menuSettings.appendChild(applySettingsButton);
+
+    menuContainer.appendChild(menuSettings);
+
+    addBackButton();
+}
+
+// Function to apply rainbow background with a slider for animation duration
+function applyRainbowBackground() {
+    clearAllEffects();
+    var animationDuration = 10;
+
+    var style = document.createElement('style');
+    style.innerHTML = `
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        body {
+            background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+            background-size: 1400% 1400%;
+            animation: rainbow ${animationDuration}s ease infinite;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            transition: background 0.5s;
+        }
+    `;
+    document.head.appendChild(style);
+
+    var description = document.createElement('p');
+    description.textContent = 'This effect creates a rainbow background animation.';
+    description.style.marginBottom = '10px';
+    menuContainer.appendChild(description);
+
+    var slider = createSlider('Animation Duration (s)', 1, 20, animationDuration, function(e) {
+        animationDuration = e.target.value;
+        style.innerHTML = `
+            @keyframes rainbow {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
+            }
+            body {
+                background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet);
+                background-size: 1400% 1400%;
+                animation: rainbow ${animationDuration}s ease infinite;
+                margin: 0;
+                height: 100vh;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                text-align: center;
+                transition: background 0.5s;
+            }
+        `;
+    });
+    menuContainer.appendChild(slider);
+
+    addBackButton();
+    addResetButton();
+}
+
+// Function to apply invert effect with a slider for invert amount
+function applyInvert() {
+    clearAllEffects();
+    var invertAmount = 100;
+
+    var style = document.createElement('style');
+    style.innerHTML = `
+        body {
+            filter: invert(${invertAmount}%);
+            transition: filter 0.5s;
+        }
+    `;
+    document.head.appendChild(style);
+
+    var description = document.createElement('p');
+    description.textContent = 'This effect inverts the colors of the page.';
+    description.style.marginBottom = '10px';
+    menuContainer.appendChild(description);
+
+    var slider = createSlider('Invert Amount (%)', 0, 100, invertAmount, function(e) {
+        invertAmount = e.target.value;
+        style.innerHTML = `
+            body {
+                filter: invert(${invertAmount}%);
+                transition: filter 0.5s;
+            }
+        `;
+    });
+    menuContainer.appendChild(slider);
+
+    addBackButton();
+    addResetButton();
+}
+
+// Function to apply grayscale effect with a slider for grayscale amount
+function applyGrayscale() {
+    clearAllEffects();
+    var grayscaleAmount = 0;
+
+    var style = document.createElement('style');
+    style.innerHTML = `
+        body {
+            filter: grayscale(${grayscaleAmount}%);
+            transition: filter 0.5s;
+        }
+    `;
+    document.head.appendChild(style);
+
+    var description = document.createElement('p');
+    description.textContent = 'This effect converts the page to grayscale.';
+    description.style.marginBottom = '10px';
+    menuContainer.appendChild(description);
+
+    var slider = createSlider('Grayscale Amount (%)', 0, 100, grayscaleAmount, function(e) {
+        grayscaleAmount = e.target.value;
+        style.innerHTML = `
+            body {
+                filter: grayscale(${grayscaleAmount}%);
+                transition: filter 0.5s;
+            }
+        `;
+    });
+    menuContainer.appendChild(slider);
+
+    addBackButton();
+    addResetButton();
+}
+
+// Function to apply sepia effect with a slider for sepia amount
+function applySepia() {
+    clearAllEffects();
+    var sepiaAmount = 0;
+
+    var style = document.createElement('style');
+    style.innerHTML = `
+        body {
+            filter: sepia(${sepiaAmount}%);
+            transition: filter 0.5s;
+        }
+    `;
+    document.head.appendChild(style);
+
+    var description = document.createElement('p');
+    description.textContent = 'This effect applies sepia tone to the page.';
+    description.style.marginBottom = '10px';
+    menuContainer.appendChild(description);
+
+    var slider = createSlider('Sepia Amount (%)', 0, 100, sepiaAmount, function(e) {
+        sepiaAmount = e.target.value;
+        style.innerHTML = `
+            body {
+                filter: sepia(${sepiaAmount}%);
+                transition: filter 0.5s;
+            }
+        `;
+    });
+    menuContainer.appendChild(slider);
+
+    addBackButton();
+    addResetButton();
+}
+
+// Function to apply blur effect with a slider for blur amount
+function applyBlur() {
+    clearAllEffects();
+    var blurAmount = 0;
+
+    var style = document.createElement('style');
+    style.innerHTML = `
+        body {
+            filter: blur(${blurAmount}px);
+            transition: filter 0.5s;
+        }
+    `;
+    document.head.appendChild(style);
+
+    var description = document.createElement('p');
+    description.textContent = 'This effect applies blur to the page.';
+    description.style.marginBottom = '10px';
+    menuContainer.appendChild(description);
+
+    var slider = createSlider('Blur Amount (px)', 0, 10, blurAmount, function(e) {
+        blurAmount = e.target.value;
+        style.innerHTML = `
+            body {
+                filter: blur(${blurAmount}px);
+                transition: filter 0.5s;
+            }
+        `;
+    });
+    menuContainer.appendChild(slider);
+
+    addBackButton();
+    addResetButton();
+}
+
+// Function to apply brightness effect with a slider for brightness amount
+function applyBrightness() {
+    clearAllEffects();
+    var brightnessAmount = 100;
+
+    var style = document.createElement('style');
+    style.innerHTML = `
+        body {
+            filter: brightness(${brightnessAmount}%);
+            transition: filter 0.5s;
+        }
+    `;
+    document.head.appendChild(style);
+
+    var description = document.createElement('p');
+    description.textContent = 'This effect adjusts the brightness of the page.';
+    description.style.marginBottom = '10px';
+    menuContainer.appendChild(description);
+
+    var slider = createSlider('Brightness Amount (%)', 0, 200, brightnessAmount, function(e) {
+        brightnessAmount = e.target.value;
+        style.innerHTML = `
+            body {
+                filter: brightness(${brightnessAmount}%);
+                transition: filter 0.5s;
+            }
+        `;
+    });
+    menuContainer.appendChild(slider);
+
+    addBackButton();
+    addResetButton();
+}
+
+// Function to apply contrast effect with a slider for contrast amount
+function applyContrast() {
+    clearAllEffects();
+    var contrastAmount = 100;
+
+    var style = document.createElement('style');
+    style.innerHTML = `
+        body {
+            filter: contrast(${contrastAmount}%);
+            transition: filter 0.5s;
+        }
+    `;
+    document.head.appendChild(style);
+
+    var description = document.createElement('p');
+    description.textContent = 'This effect adjusts the contrast of the page.';
+    description.style.marginBottom = '10px';
+    menuContainer.appendChild(description);
+
+    var slider = createSlider('Contrast Amount (%)', 0, 200, contrastAmount, function(e) {
+        contrastAmount = e.target.value;
+        style.innerHTML = `
+            body {
+                filter: contrast(${contrastAmount}%);
+                transition: filter 0.5s;
+            }
+        `;
+    });
+    menuContainer.appendChild(slider);
+
+    addBackButton();
+    addResetButton();
+}
+
+// Function to apply hue-rotate effect with a slider for hue-rotate amount
+function applyHueRotate() {
+    clearAllEffects();
+    var hueRotateAmount = 0;
+
+    var style = document.createElement('style');
+    style.innerHTML = `
+        body {
+            filter: hue-rotate(${hueRotateAmount}deg);
+            transition: filter 0.5s;
+        }
+    `;
+    document.head.appendChild(style);
+
+    var description = document.createElement('p');
+    description.textContent = 'This effect adjusts the hue rotation of the page.';
+    description.style.marginBottom = '10px';
+    menuContainer.appendChild(description);
+
+    var slider = createSlider('Hue Rotate Amount (deg)', 0, 360, hueRotateAmount, function(e) {
+        hueRotateAmount = e.target.value;
+        style.innerHTML = `
+            body {
+                filter: hue-rotate(${hueRotateAmount}deg);
+                transition: filter 0.5s;
+            }
+        `;
+    });
+    menuContainer.appendChild(slider);
+
+    addBackButton();
+    addResetButton();
+}
+
+// Function to apply saturate effect with a slider for saturation amount
+function applySaturate() {
+    clearAllEffects();
+    var saturateAmount = 100;
+
+    var style = document.createElement('style');
+    style.innerHTML = `
+        body {
+            filter: saturate(${saturateAmount}%);
+            transition: filter 0.5s;
+        }
+    `;
+    document.head.appendChild(style);
+
+    var description = document.createElement('p');
+    description.textContent = 'This effect adjusts the saturation of the page.';
+    description.style.marginBottom = '10px';
+    menuContainer.appendChild(description);
+
+    var slider = createSlider('Saturation Amount (%)', 0, 200, saturateAmount, function(e) {
+        saturateAmount = e.target.value;
+        style.innerHTML = `
+            body {
+                filter: saturate(${saturateAmount}%);
+                transition: filter 0.5s;
+            }
+        `;
+    });
+    menuContainer.appendChild(slider);
+
+    addBackButton();
+    addResetButton();
+}
+
+// Function to add a back button
+function addBackButton() {
+    var backButton = createButton('Back', showMainEffects);
+    menuContainer.appendChild(backButton);
+}
+
+// Function to add a reset button
+function addResetButton() {
+    var resetButton = createButton('Reset', clearAllEffects);
+    menuContainer.appendChild(resetButton);
+}
+
+// Function to show main effects
+function showMainEffects() {
+    menuContainer.innerHTML = '';
+
+    var effects = [
+        { name: 'Rainbow Background', action: applyRainbowBackground },
+        { name: 'Invert Colors', action: applyInvert },
+        { name: 'Grayscale', action: applyGrayscale },
+        { name: 'Sepia', action: applySepia },
+        { name: 'Blur', action: applyBlur },
+        { name: 'Brightness', action: applyBrightness },
+        { name: 'Contrast', action: applyContrast },
+        { name: 'Hue Rotate', action: applyHueRotate },
+        { name: 'Saturate', action: applySaturate }
+        // Add more effects as needed
+    ];
+
+    effects.forEach(function(effect) {
+        var button = createButton(effect.name, effect.action);
+        menuContainer.appendChild(button);
+    });
+
+    addSettingsButton();
+    makeDraggable(menuContainer);
+}
+
+// Function to add a settings button
+function addSettingsButton() {
+    var settingsButton = createButton('Settings', showSettingsPage);
+    menuContainer.appendChild(settingsButton);
+}
+
+// Function to show settings page
+function showSettingsPage() {
+    menuContainer.innerHTML = '';
+
+    var title = document.createElement('h2');
+    title.textContent = 'Primates Visual Menu Pro Settings';
+    title.style.textAlign = 'center';
+    title.style.marginBottom = '20px';
+    menuContainer.appendChild(title);
+
+    // Settings for menu customization
+    var menuSettings = document.createElement('div');
+    menuSettings.style.marginBottom = '20px';
+
+    var menuTitleLabel = document.createElement('label');
+    menuTitleLabel.textContent = 'Menu Title:';
+    menuTitleLabel.style.display = 'block';
+    menuTitleLabel.style.marginBottom = '5px';
+    menuSettings.appendChild(menuTitleLabel);
+
+    var menuTitleInput = document.createElement('input');
+    menuTitleInput.type = 'text';
+    menuTitleInput.value = 'Primates Visual Menu Pro';
+    menuTitleInput.style.width = '100%';
+    menuSettings.appendChild(menuTitleInput);
+
+    var menuColorLabel = document.createElement('label');
+    menuColorLabel.textContent = 'Menu Color:';
+    menuColorLabel.style.display = 'block';
+    menuColorLabel.style.marginTop = '10px';
+    menuColorLabel.style.marginBottom = '5px';
+    menuSettings.appendChild(menuColorLabel);
+
+    var menuColorInput = document.createElement('input');
+    menuColorInput.type = 'color';
+    menuColorInput.value = '#007BFF';
+    menuColorInput.style.width = '100px';
+    menuSettings.appendChild(menuColorInput);
+
+    var applySettingsButton = document.createElement('button');
+    applySettingsButton.textContent = 'Apply Settings';
+    applySettingsButton.style.width = '100%';
+    applySettingsButton.style.marginTop = '10px';
+    applySettingsButton.style.padding = '10px';
+    applySettingsButton.style.border = 'none';
+    applySettingsButton.style.backgroundColor = '#28A745';
+    applySettingsButton.style.color = 'white';
+    applySettingsButton.style.fontSize = '16px';
+    applySettingsButton.style.cursor = 'pointer';
+    applySettingsButton.addEventListener('click', function() {
+        menuContainer.style.backgroundColor = menuColorInput.value;
+        title.textContent = menuTitleInput.value;
+    });
+    menuSettings.appendChild(applySettingsButton);
+
+    menuContainer.appendChild(menuSettings);
+
+    addBackButton();
+}
+
+// Initialize the menu
+var menuContainer = document.createElement('div');
+menuContainer.style.position = 'fixed';
+menuContainer.style.top = '50px';
+menuContainer.style.left = '50px';
+menuContainer.style.padding = '20px';
+menuContainer.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+menuContainer.style.border = '1px solid #ccc';
+menuContainer.style.borderRadius = '10px'; // Rounded corners
+menuContainer.style.width = '300px'; // Initial width
+menuContainer.style.maxHeight = '80vh'; // Limit height for scrolling
+menuContainer.style.overflowY = 'auto'; // Enable vertical scrolling
+document.body.appendChild(menuContainer);
+
+// Helper function to create a button
+function createButton(text, onClick) {
+    var button = document.createElement('button');
+    button.textContent = text;
+    button.style.width = '100%';
+    button.style.marginBottom = '10px'; // Add margin between buttons
+    button.style.padding = '10px';
+    button.style.border = 'none';
+    button.style.backgroundColor = '#007BFF';
+    button.style.color = 'white';
+    button.style.fontSize = '16px';
+    button.style.cursor = 'pointer';
+    button.addEventListener('click', onClick);
+    return button;
+}
+
+// Function to make an element draggable
+function makeDraggable(element) {
+    element.style.cursor = 'move';
+    var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+    element.onmousedown = dragMouseDown;
+
+    function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+    }
+
+    function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        element.style.top = (element.offsetTop - pos2) + "px";
+        element.style.left = (element.offsetLeft - pos1) + "px";
+    }
+
+    function closeDragElement() {
+        document.onmouseup = null;
+        document.onmousemove = null;
+    }
+}
+
+// Function to clear all effects
+function clearAllEffects() {
+    var styleTags = document.querySelectorAll('style');
+    styleTags.forEach(tag => tag.remove());
+    document.body.style.background = '';
+    document.body.style.color = '';
+    document.body.style.animation = '';
+    menuContainer.innerHTML = '';
+    showMainEffects();
+}
+
+// Function to add a back button
+function addBackButton() {
+    var backButton = createButton('Back', showMainEffects);
+    menuContainer.appendChild(backButton);
+}
+
+// Function to add a reset button
+function addResetButton() {
+    var resetButton = createButton('Reset', clearAllEffects);
+    menuContainer.appendChild(resetButton);
+}
+
+// Function to show main effects
+function showMainEffects() {
+    menuContainer.innerHTML = '';
+
+    var effects = [
+        { name: 'Rainbow Background', action: applyRainbowBackground },
+        { name: 'Invert Colors', action: applyInvert },
+        { name: 'Grayscale', action: applyGrayscale },
+        { name: 'Sepia', action: applySepia },
+        { name: 'Blur', action: applyBlur },
+        { name: 'Brightness', action: applyBrightness },
+        { name: 'Contrast', action: applyContrast },
+        { name: 'Hue Rotate', action: applyHueRotate },
+        { name: 'Saturate', action: applySaturate }
+        { name: 'Custom Color Overlay', action: applyCustomColorOverlay }
+
+
+    ];
+
+    effects.forEach(function(effect) {
+        var button = createButton(effect.name, effect.action);
+        menuContainer.appendChild(button);
+    });
+
+    addSettingsButton();
+    makeDraggable(menuContainer);
+}
+
+// Function to add a settings button
+function addSettingsButton() {
+    var settingsButton = createButton('Settings', showSettingsPage);
+    menuContainer.appendChild(settingsButton);
+}
+
+// Inside showMainEffects() function
+var customOverlayButton = createButton('Custom Color Overlay', applyCustomColorOverlay);
+menuContainer.appendChild(customOverlayButton);
+
+}
+
+
+// Initial call to show the main effects menu
+showMainEffects();
+
