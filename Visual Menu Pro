@@ -1,7 +1,4 @@
-To enhance the menu further by adding a settings page where you can customize aspects such as menu size, color, and title, and also to implement a title at the top of the menu, here's how you can modify and extend the existing code:
 
-```javascript
-// Initialize the menu and settings
 var menuContainer = document.createElement('div');
 menuContainer.style.position = 'fixed';
 menuContainer.style.top = '50px';
